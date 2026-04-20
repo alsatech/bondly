@@ -9,6 +9,8 @@ abstract final class ApiEndpoints {
 
   // Profile
   static const String users = '/api/v1/users';
+  static const String myInterests = '/api/v1/users/me/interests';
+  static const String myPhotos = '/api/v1/users/me/photos';
 
   // Posts
   static const String posts = '/api/v1/posts';

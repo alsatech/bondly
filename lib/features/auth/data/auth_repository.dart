@@ -44,10 +44,13 @@ class AuthRepository {
     }
   }
 
-  /// Multi-step registration. Uploads photo if provided.
+  /// Multi-step registration. Persists interests + photo if provided.
+  ///
+  /// Steps 2 and 3 are best-effort: if they fail the account is still valid
+  /// and the user can retry from the profile editor.
   Future<UserModel> register(RegisterRequest request) async {
     try {
-      // Step 1: create account
+      // Step 1: create account + store tokens
       final response = await dio.post(
         ApiEndpoints.register,
         data: request.toJson(),
@@ -61,9 +64,18 @@ class AuthRepository {
         refreshToken: tokens.refreshToken,
       );
 
-      // Step 2: upload profile photo if provided
+      // Step 2: persist interests
+      if (request.interests.isNotEmpty) {
+        try {
+          await _setInterests(request.interests);
+        } catch (_) {}
+      }
+
+      // Step 3: upload profile photo
       if (request.profilePhotoPath != null) {
-        await _uploadProfilePhoto(request.profilePhotoPath!);
+        try {
+          await _uploadProfilePhoto(request.profilePhotoPath!);
+        } catch (_) {}
       }
 
       return getMe();
@@ -121,7 +133,18 @@ class AuthRepository {
   // Private helpers
   // ---------------------------------------------------------------------------
 
+  Future<void> _setInterests(List<String> interests) async {
+    await dio.put(
+      ApiEndpoints.myInterests,
+      data: {'interests': interests},
+    );
+  }
+
   Future<void> _uploadProfilePhoto(String filePath) async {
+    // TODO: The backend POST /users/me/photos expects a JSON body with a
+    // pre-uploaded URL (PhotoCreate schema), not a multipart file. We'll
+    // need an upload service (S3/Cloudinary) before this works. For now
+    // we keep the call so the flow is wired, but it will 422.
     final formData = FormData.fromMap({
       'photo': await MultipartFile.fromFile(
         filePath,
@@ -130,7 +153,7 @@ class AuthRepository {
     });
 
     await dio.post(
-      '${ApiEndpoints.users}/me/photo',
+      ApiEndpoints.myPhotos,
       data: formData,
     );
   }

@@ -18,10 +18,15 @@ import '../widgets/interest_chip.dart';
 // Available interests
 // ---------------------------------------------------------------------------
 
+// Must mirror the backend `interests` table so we match existing rows instead
+// of creating duplicates. Backend normalizes to lowercase on receive.
+// See TECH_DEBT.md — replace with a dynamic fetch in MVP v2.
 const _availableInterests = [
-  'Música', 'Viajes', 'Fotografía', 'Deporte', 'Arte',
-  'Cocina', 'Lectura', 'Gaming', 'Cine', 'Yoga',
-  'Tecnología', 'Naturaleza', 'Baile', 'Fitness', 'Moda',
+  'Music', 'Fitness', 'Coffee', 'Travel', 'Photography',
+  'Hiking', 'Cooking', 'Reading', 'Gaming', 'Yoga',
+  'Dancing', 'Movies', 'Art', 'Sports', 'Restaurants',
+  'Running', 'Hyrox', 'Tennis', 'Padel', 'Meditacion',
+  'Racing Cars',
 ];
 
 const _genders = ['Hombre', 'Mujer', 'No binario', 'Prefiero no decir'];
