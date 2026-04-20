@@ -340,7 +340,7 @@ class _Step1BasicData extends StatelessWidget {
               validator: (v) {
                 final age = int.tryParse(v ?? '');
                 if (age == null) return 'Ingresa tu edad.';
-                if (age < 17 || age > 100) return 'Edad entre 17 y 100.';
+                if (age < 18 || age > 100) return 'Debes tener entre 18 y 100.';
                 return null;
               },
             ),
@@ -383,7 +383,7 @@ class _Step1BasicData extends StatelessWidget {
             BondlyTextField(
               controller: passwordController,
               label: 'Contraseña',
-              hint: 'Mínimo 8 caracteres',
+              hint: '8+ chars, con mayúscula, minúscula y número',
               isPassword: true,
               prefixIcon: const Icon(Icons.lock_outline),
               textInputAction: TextInputAction.next,
@@ -391,6 +391,15 @@ class _Step1BasicData extends StatelessWidget {
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Ingresa una contraseña.';
                 if (v.length < 8) return 'Mínimo 8 caracteres.';
+                if (!v.contains(RegExp(r'[A-Z]'))) {
+                  return 'Incluye al menos una mayúscula.';
+                }
+                if (!v.contains(RegExp(r'[a-z]'))) {
+                  return 'Incluye al menos una minúscula.';
+                }
+                if (!v.contains(RegExp(r'\d'))) {
+                  return 'Incluye al menos un número.';
+                }
                 return null;
               },
             ),

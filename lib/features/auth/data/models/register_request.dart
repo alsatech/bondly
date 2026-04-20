@@ -17,14 +17,26 @@ class RegisterRequest {
   final List<String> interests;
   final String? profilePhotoPath;
 
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'email': email,
-        'password': password,
-        'age': age,
-        'gender': gender,
-        'interests': interests,
-      };
+  Map<String, dynamic> toJson() {
+    // Backend expects `birth_date` (YYYY-MM-DD). We derive it from `age`
+    // using today's month/day so the computed age matches what the user
+    // entered. `interests` are persisted in a separate endpoint after
+    // account creation — the /auth/register schema rejects them.
+    final today = DateTime.now();
+    final birth = DateTime(today.year - age, today.month, today.day);
+    final birthDate =
+        '${birth.year.toString().padLeft(4, '0')}-'
+        '${birth.month.toString().padLeft(2, '0')}-'
+        '${birth.day.toString().padLeft(2, '0')}';
+
+    return {
+      'full_name': name,
+      'email': email,
+      'password': password,
+      'birth_date': birthDate,
+      'gender': gender,
+    };
+  }
 
   RegisterRequest copyWith({
     String? name,

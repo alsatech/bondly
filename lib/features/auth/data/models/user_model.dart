@@ -28,7 +28,8 @@ class UserModel extends Equatable {
       id: json['id']?.toString() ?? json['_id']?.toString() ?? '',
       name: json['name'] as String? ?? json['full_name'] as String? ?? '',
       email: json['email'] as String? ?? '',
-      age: (json['age'] as num?)?.toInt() ?? 0,
+      age: (json['age'] as num?)?.toInt() ??
+          _ageFromBirthDate(json['birth_date']?.toString()),
       gender: json['gender'] as String? ?? '',
       profilePhotoUrl: json['profile_photo_url'] as String? ??
           json['avatar_url'] as String? ??
@@ -42,6 +43,19 @@ class UserModel extends Equatable {
           ? DateTime.tryParse(json['created_at'].toString())
           : null,
     );
+  }
+
+  static int _ageFromBirthDate(String? birthDate) {
+    if (birthDate == null) return 0;
+    final parsed = DateTime.tryParse(birthDate);
+    if (parsed == null) return 0;
+    final now = DateTime.now();
+    var age = now.year - parsed.year;
+    if (now.month < parsed.month ||
+        (now.month == parsed.month && now.day < parsed.day)) {
+      age--;
+    }
+    return age;
   }
 
   Map<String, dynamic> toJson() => {
