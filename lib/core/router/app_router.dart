@@ -42,7 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (authState is AuthUnauthenticated || authState is AuthError) {
-        if (!isAuthRoute && !isSplash) return AppRoutes.login;
+        if (!isAuthRoute) return AppRoutes.login;
         return null;
       }
 
