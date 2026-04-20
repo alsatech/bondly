@@ -17,7 +17,7 @@ Bondly is a dating + social app (ages 17–34, Americas). Flutter MVP with dark 
 
 **Fonts**: Playfair Display (headlines/display), DM Sans (body/UI) — via google_fonts.
 
-**Current state**: Auth module complete (splash, login, register multi-step). Home is a placeholder. Other features not yet started.
+**Current state**: Auth module complete (splash, login, register multi-step). Discover (matching) module complete — swipe stack on /home. Other features not yet started.
 
 **Why:** MVP scope — dark only, no over-engineering, strict feature-first folder structure.
 **How to apply:** Always verify theme is dark-only. No light theme variants. Read skills.md before any new screen.

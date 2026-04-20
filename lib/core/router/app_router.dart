@@ -6,6 +6,7 @@ import '../../features/auth/presentation/providers/auth_notifier.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/discover/presentation/screens/discover_screen.dart';
 
 // ---------------------------------------------------------------------------
 // Route names
@@ -74,7 +75,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.home,
         pageBuilder: (context, state) => _fadeTransition(
           state: state,
-          child: const _HomePlaceholder(),
+          child: const DiscoverScreen(),
         ),
       ),
     ],
@@ -132,19 +133,3 @@ CustomTransitionPage<void> _slideTransition({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Home placeholder (to be replaced when home feature is built)
-// ---------------------------------------------------------------------------
-
-class _HomePlaceholder extends StatelessWidget {
-  const _HomePlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text('Home — Coming soon'),
-      ),
-    );
-  }
-}

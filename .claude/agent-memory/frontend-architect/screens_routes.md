@@ -11,7 +11,7 @@ type: project
 | SplashScreen | `/` | `lib/features/auth/presentation/screens/splash_screen.dart` |
 | LoginScreen | `/auth/login` | `lib/features/auth/presentation/screens/login_screen.dart` |
 | RegisterScreen | `/auth/register` | `lib/features/auth/presentation/screens/register_screen.dart` |
-| Home (placeholder) | `/home` | inline in `lib/core/router/app_router.dart` |
+| DiscoverScreen | `/home` | `lib/features/discover/presentation/screens/discover_screen.dart` |
 
 ## Router config
 File: `lib/core/router/app_router.dart`

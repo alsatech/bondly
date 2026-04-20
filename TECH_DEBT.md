@@ -27,7 +27,14 @@ Bugs, shortcuts, and deferred work. Each entry: **what**, **why**, **where**, **
 - **Fix:** Replace the age `TextFormField` with a `DatePicker` (min age 18 enforced via `firstDate`/`lastDate`). Send the real date.
 - **Target:** MVP v2, before any matching/discovery feature that filters by age.
 
-### 4. Interest step UX does not enforce "min 3"
+### 4. No logout UI anywhere in the app
+- **What:** Tokens are persisted in `flutter_secure_storage`, so once a user signs in they stay logged in across app restarts. There is no button or gesture to call `AuthNotifier.logout()`.
+- **Why:** Deferred until the Home screen exists — didn't want to put a temporary button on the `_HomePlaceholder` and then throw it away.
+- **Risk:** During development, the only way to test the login flow is to clear app data from the emulator. For QA, hard to hand a build to someone without a way to sign out.
+- **Fix:** Add a "Cerrar sesión" action in the Home AppBar (or Settings when that exists) that calls `ref.read(authNotifierProvider.notifier).logout()`. The router redirect will send them back to `/auth/login` automatically.
+- **Target:** Ship with the first Home screen iteration (not a separate milestone).
+
+### 5. Interest step UX does not enforce "min 3"
 - **What:** Step 3 label says "Selecciona al menos 3 intereses" but the submit button does not block on count; backend accepts 1+.
 - **Why:** Oversight during multi-step wiring.
 - **Fix:** Either drop the copy to "1 o más" (match backend rule) or add a validator before `_submit()`.
@@ -37,14 +44,14 @@ Bugs, shortcuts, and deferred work. Each entry: **what**, **why**, **where**, **
 
 ## Networking
 
-### 5. Error mapping conflates 400 and 409 as `EmailAlreadyInUse`
+### 6. Error mapping conflates 400 and 409 as `EmailAlreadyInUse`
 - **What:** `AuthRepository._mapDioException` returns `EmailAlreadyInUse` for both HTTP 400 and 409.
 - **Why:** Early stub before backend error contract was stabilized.
 - **Risk:** Any 400 from the backend (generic validation error) is shown as "email ya registrado" — confusing for users hitting a password-strength failure, etc.
 - **Fix:** Only map 409 to `EmailAlreadyInUse`. For 400/422 surface the `detail` field from the response verbatim or map known codes.
 - **Target:** Before v1.0.
 
-### 6. Router rebuilds on every auth state change
+### 7. Router rebuilds on every auth state change
 - **What:** `routerProvider` watches `authNotifierProvider` and rebuilds the whole `GoRouter` instance on each state transition.
 - **Why:** Simplest way to plumb auth state into routing without `ChangeNotifier`.
 - **Risk:** Loses in-flight navigation state (e.g. pushed modal routes). Each rebuild resets to `initialLocation`. Works today because the graph is small.
@@ -55,7 +62,7 @@ Bugs, shortcuts, and deferred work. Each entry: **what**, **why**, **where**, **
 
 ## Coupling with backend
 
-### 7. `Interest.name` capitalization mismatch
+### 8. `Interest.name` capitalization mismatch
 - **What:** Backend repo `get_or_create` stores interest names in lowercase, but seed data was inserted capitalized (`Music`, `Fitness`). Required a one-off `UPDATE interests SET name = LOWER(name);`.
 - **Why:** Initial seed did not respect the documented invariant.
 - **Risk (already mitigated):** Duplicate rows (`Music` vs `music`) breaking matching by shared interests.

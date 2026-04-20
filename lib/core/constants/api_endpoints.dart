@@ -17,6 +17,7 @@ abstract final class ApiEndpoints {
 
   // Matching
   static const String matches = '/api/v1/matches';
+  static const String matchesDiscover = '/api/v1/matches/discover';
 
   // Chat
   static const String conversations = '/api/v1/conversations';

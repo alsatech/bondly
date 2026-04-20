@@ -33,6 +33,7 @@ dependencies:
 
   # UI
   shimmer: ^3.0.0
+  appinio_swiper: ^2.1.1
 
   # Utilities
   cupertino_icons: ^1.0.8
