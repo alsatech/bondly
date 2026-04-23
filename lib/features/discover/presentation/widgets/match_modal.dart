@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_typography.dart';
-import '../../../../shared/widgets/bondly_button.dart';
 
 /// Full-screen overlay shown when a mutual match is detected.
 ///
@@ -36,9 +35,8 @@ class _MatchModalState extends State<MatchModal>
       duration: const Duration(milliseconds: 320),
     );
 
-    _scaleAnimation = CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutBack,
+    _scaleAnimation = Tween<double>(begin: 0.9, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic),
     );
 
     _fadeAnimation = CurvedAnimation(
@@ -78,43 +76,55 @@ class _MatchModalState extends State<MatchModal>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Heart icon
-                      Container(
-                        width: 96,
-                        height: 96,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha:0.15),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.favorite_rounded,
-                          color: AppColors.textPrimary,
-                          size: 52,
-                        ),
+                      // Heart icon — 80px white icon
+                      const Icon(
+                        Icons.favorite_rounded,
+                        color: Colors.white,
+                        size: 80,
                       ),
                       const SizedBox(height: 32),
                       Text(
                         '¡Es un match!',
-                        style: AppTypography.displayMedium.copyWith(
-                          color: AppColors.textPrimary,
+                        style: GoogleFonts.playfairDisplay(
+                          fontSize: 36,
                           fontWeight: FontWeight.w700,
+                          color: Colors.white,
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Tu y ${widget.matchedName} se dieron like.',
-                        style: AppTypography.bodyLarge.copyWith(
-                          color: AppColors.textPrimary.withValues(alpha:0.88),
+                        'Tú y ${widget.matchedName} se dieron like.',
+                        style: GoogleFonts.dmSans(
+                          fontSize: 16,
+                          color: Colors.white.withValues(alpha: 0.80),
                         ),
                         textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 52),
-                      BondlyButton(
-                        label: 'Seguir explorando',
-                        onPressed: widget.onContinue,
-                        variant: BondlyButtonVariant.outline,
-                        minimumSize: const Size(240, 54),
+                      // CTA: white filled, coral text
+                      SizedBox(
+                        width: 240,
+                        height: 54,
+                        child: ElevatedButton(
+                          onPressed: widget.onContinue,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primary,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          child: Text(
+                            'Seguir explorando',
+                            style: GoogleFonts.dmSans(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),

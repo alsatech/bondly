@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 
-/// Like action button (heart) shown below the swipe stack.
+/// Like action button (heart) — primary CTA, 72px, green background with glow.
 class LikeActionButton extends StatelessWidget {
   const LikeActionButton({
     super.key,
     required this.onPressed,
-    this.size = 60,
+    this.size = 72,
   });
 
   final VoidCallback onPressed;
@@ -19,19 +19,19 @@ class LikeActionButton extends StatelessWidget {
       onPressed: onPressed,
       size: size,
       icon: Icons.favorite_rounded,
-      iconColor: AppColors.success,
-      borderColor: AppColors.success,
+      iconColor: Colors.white,
+      backgroundColor: AppColors.success,
       shadowColor: AppColors.success,
     );
   }
 }
 
-/// Skip action button (X) shown below the swipe stack.
+/// Skip action button (X) — 56px, dark background.
 class SkipActionButton extends StatelessWidget {
   const SkipActionButton({
     super.key,
     required this.onPressed,
-    this.size = 60,
+    this.size = 56,
   });
 
   final VoidCallback onPressed;
@@ -43,9 +43,9 @@ class SkipActionButton extends StatelessWidget {
       onPressed: onPressed,
       size: size,
       icon: Icons.close_rounded,
-      iconColor: AppColors.textSecondary,
-      borderColor: AppColors.border,
-      shadowColor: AppColors.textSecondary,
+      iconColor: Colors.white,
+      backgroundColor: AppColors.border,
+      shadowColor: Colors.transparent,
     );
   }
 }
@@ -60,7 +60,7 @@ class _CircleActionButton extends StatelessWidget {
     required this.size,
     required this.icon,
     required this.iconColor,
-    required this.borderColor,
+    required this.backgroundColor,
     required this.shadowColor,
   });
 
@@ -68,7 +68,7 @@ class _CircleActionButton extends StatelessWidget {
   final double size;
   final IconData icon;
   final Color iconColor;
-  final Color borderColor;
+  final Color backgroundColor;
   final Color shadowColor;
 
   @override
@@ -80,15 +80,16 @@ class _CircleActionButton extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: AppColors.card,
-          border: Border.all(color: borderColor, width: 2),
-          boxShadow: [
-            BoxShadow(
-              color: shadowColor.withValues(alpha: 0.15),
-              blurRadius: 12,
-              spreadRadius: 2,
-            ),
-          ],
+          color: backgroundColor,
+          boxShadow: shadowColor != Colors.transparent
+              ? [
+                  BoxShadow(
+                    color: shadowColor.withValues(alpha: 0.30),
+                    blurRadius: 16,
+                    spreadRadius: 2,
+                  ),
+                ]
+              : null,
         ),
         child: Icon(
           icon,

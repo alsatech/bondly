@@ -71,6 +71,58 @@ Bugs, shortcuts, and deferred work. Each entry: **what**, **why**, **where**, **
 
 ---
 
+## Feed
+
+### 9. Missing location / music / external link fields on PostResponse
+- **What:** The Feed UI spec calls for location (place name + barrio/city), music info (song + artist), and an external link overlay on each post card. None of these fields exist on the backend `PostResponse` schema.
+- **Why:** Backend has not shipped these fields yet. `PostOverlay` widget exists but renders nothing.
+- **Risk:** UI slots are absent from V1; users cannot see location or music context on posts even when backend ships them without a frontend release.
+- **Fix:** When backend adds `location`, `music`, and `external_link` fields to `PostResponse`, update `Post` model and `PostOverlay` widget to render them.
+- **Target:** MVP v2.
+
+### 10. Missing founder flag and badge system on author
+- **What:** The spec shows a "Founder ★" badge on post author avatars. No `is_founder` field exists in `PostAuthor` schema, and no badge system exists at all.
+- **Why:** Badge/founder system not yet designed on backend.
+- **Risk:** Founder users have no visual distinction in V1.
+- **Fix:** Add `is_founder` (and eventually `badges[]`) to the user/author schema. Update `PostHeader` and `DiscoverCard` to render badge indicators.
+- **Target:** MVP v2.
+
+### 11. Missing follow / is_following flag on post author
+- **What:** The Feed spec shows a "Follow" button on post headers. No `is_following` field is present in `PostAuthor`. Follow button is absent from the current UI (not rendered as a no-op — just absent) to avoid misrepresenting state.
+- **Why:** Follow state requires a per-viewer query that isn't part of the feed response today.
+- **Risk:** Users cannot follow new creators from the feed without navigating to their profile.
+- **Fix:** Backend should include `is_following` boolean in `PostAuthor` (viewer-scoped). Frontend adds follow button to `PostHeader`, calls `POST /api/v1/follows/{user_id}` on tap.
+- **Target:** MVP v2.
+
+### 12. Missing comments module, share count, and bookmark state
+- **What:** Comments button, share count, and bookmark button all appear in the `PostActionsRow` UI but are no-ops showing "Próximamente" snackbar. No comments endpoint exists; no share or bookmark fields in schema.
+- **Why:** Comments module not yet built on backend. Share/bookmark state not tracked.
+- **Risk:** Core social engagement features are non-functional. Users expect them to work.
+- **Fix:** Implement comments module (`GET/POST /api/v1/posts/{id}/comments`). Add `comments_count`, `shares_count`, and `is_bookmarked` to `PostResponse`. Wire all four actions.
+- **Target:** MVP v2 (comments are P1).
+
+### 13. Feed tab filtering not implemented on backend
+- **What:** Five tabs (Para Ti, Founders, Lugares, Eventos, Comida) are rendered and interactive in the UI but all five trigger the same `GET /api/v1/posts/feed` call without any filter parameter. Tabs feel alive (active state updates) but data does not change.
+- **Why:** Backend `/feed` endpoint does not accept a `tab` or `category` filter parameter.
+- **Fix:** Add `tab` query param to `/feed` endpoint (e.g. `?tab=founders`). Update `FeedRepository.fetchFeed` and `FeedNotifier.loadInitial`/`selectTab` to pass the active tab.
+- **Target:** MVP v2.
+
+### 14. Video playback not implemented
+- **What:** Video media items in posts show a thumbnail with a play icon overlay but tapping does nothing. No video player is wired.
+- **Why:** Video playback adds significant complexity (buffering, controls, fullscreen). Deferred to keep V1 scope lean.
+- **Risk:** Videos silently appear as static thumbnails. Users may think the app is broken.
+- **Fix:** Add `video_player` or `chewie` package. Implement inline playback in `PostMediaView` when `media.isVideo` is true.
+- **Target:** MVP v2.
+
+### 15. HomeShell uses IndexedStack instead of StatefulShellRoute
+- **What:** `HomeShell` is a plain `StatefulWidget` with `IndexedStack` rather than GoRouter's `StatefulShellRoute`. Deep links to `/home/feed` or `/home/discover` are not handled — they fall through to the parent `/home` route.
+- **Why:** Simpler to ship for V1 with only two tabs. `StatefulShellRoute` setup requires restructuring the entire router configuration.
+- **Risk:** Deep links into specific tabs will not work. As more tabs are added, the IndexedStack approach becomes harder to maintain.
+- **Fix:** Migrate `app_router.dart` to use `StatefulShellRoute` with branch routes for `/home/feed` and `/home/discover`. Each branch preserves its own navigator stack.
+- **Target:** Before adding a third tab (chat, notifications, or profile).
+
+---
+
 ## How to use this file
 
 - Add an entry when we take a shortcut we know we'll pay for later. Don't wait until it breaks.

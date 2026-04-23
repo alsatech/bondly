@@ -12,8 +12,10 @@ abstract final class ApiEndpoints {
   static const String myInterests = '/api/v1/users/me/interests';
   static const String myPhotos = '/api/v1/users/me/photos';
 
-  // Posts
+  // Posts / Feed
   static const String posts = '/api/v1/posts';
+  static const String postsFeed = '/api/v1/posts/feed';
+  static String postLike(String postId) => '/api/v1/posts/$postId/like';
 
   // Matching
   static const String matches = '/api/v1/matches';

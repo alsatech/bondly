@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
@@ -37,38 +38,39 @@ class DiscoverCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Avatar / Gradient background
+            // Background: image or gradient
             _buildBackground(),
 
-            // Bottom gradient scrim for text legibility.
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    stops: const [0.45, 1.0],
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withValues(alpha:0.82),
-                    ],
+            // Bottom-to-top dark gradient for text legibility (only when avatar present).
+            if (candidate.avatarUrl != null)
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      stops: const [0.5, 1.0],
+                      colors: [
+                        Colors.transparent,
+                        AppColors.background.withValues(alpha: 0.85),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
 
-            // Swipe overlay (like = green, skip = gray).
+            // Swipe overlay tint.
             if (swipeDirection != 0.0) _buildSwipeOverlay(),
 
-            // Card content — badges + info at the bottom.
+            // Bottom-left content
             Positioned(
               left: 20,
               right: 20,
-              bottom: 24,
+              bottom: 28,
               child: _buildContent(),
             ),
 
-            // Like / skip stamp labels shown on swipe.
+            // Swipe stamp labels.
             if (swipeDirection > 0.15)
               Positioned(
                 top: 32,
@@ -92,23 +94,21 @@ class DiscoverCard extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: candidate.avatarUrl!,
         fit: BoxFit.cover,
-        placeholder: (_, __) => _AvatarPlaceholder(initial: candidate.initial),
+        placeholder: (_, __) => _GradientBackground(initial: candidate.initial),
         errorWidget: (_, __, ___) =>
-            _AvatarPlaceholder(initial: candidate.initial),
+            _GradientBackground(initial: candidate.initial),
       );
     }
-    return _AvatarPlaceholder(initial: candidate.initial);
+    return _GradientBackground(initial: candidate.initial);
   }
 
   Widget _buildSwipeOverlay() {
     final isLike = swipeDirection > 0;
     final color = isLike
-        ? AppColors.success.withValues(alpha:swipeDirection.abs() * 0.35)
-        : AppColors.textSecondary.withValues(alpha:swipeDirection.abs() * 0.25);
+        ? AppColors.success.withValues(alpha: swipeDirection.abs() * 0.35)
+        : AppColors.textSecondary.withValues(alpha: swipeDirection.abs() * 0.25);
 
-    return Positioned.fill(
-      child: ColoredBox(color: color),
-    );
+    return Positioned.fill(child: ColoredBox(color: color));
   }
 
   Widget _buildContent() {
@@ -116,33 +116,21 @@ class DiscoverCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Badges row.
-        Row(
-          children: [
-            if (candidate.sharedInterestsCount > 0)
-              _Badge(
-                label:
-                    '${candidate.sharedInterestsCount} intereses en común',
-                color: AppColors.accent.withValues(alpha:0.85),
-              ),
-            if (candidate.sharedInterestsCount > 0 && candidate.score >= 0.8)
-              const SizedBox(width: 8),
-            if (candidate.score >= 0.8)
-              const _Badge(
-                label: 'Alta afinidad',
-                color: AppColors.primary,
-              ),
-          ],
-        ),
-        if (candidate.sharedInterestsCount > 0 || candidate.score >= 0.8)
-          const SizedBox(height: 10),
-        // Full name.
+        // "Alta afinidad" pill — only when score > 0.7.
+        if (candidate.score > 0.7) ...[
+          _AffinityBadge(),
+          const SizedBox(height: 8),
+        ],
+        // Full name
         Text(
           candidate.fullName,
-          style: AppTypography.displayMedium.copyWith(
+          style: GoogleFonts.playfairDisplay(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
             shadows: [
               Shadow(
-                color: Colors.black.withValues(alpha:0.6),
+                color: Colors.black.withValues(alpha: 0.6),
                 blurRadius: 8,
               ),
             ],
@@ -150,23 +138,10 @@ class DiscoverCard extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        // Bio.
-        if (candidate.bio != null && candidate.bio!.isNotEmpty) ...[
-          const SizedBox(height: 6),
-          Text(
-            candidate.bio!,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textPrimary.withValues(alpha:0.82),
-              shadows: [
-                Shadow(
-                  color: Colors.black.withValues(alpha:0.5),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            maxLines: 3,
-            overflow: TextOverflow.ellipsis,
-          ),
+        // Shared interests chip
+        if (candidate.sharedInterestsCount > 0) ...[
+          const SizedBox(height: 8),
+          _SharedInterestsBadge(count: candidate.sharedInterestsCount),
         ],
       ],
     );
@@ -177,19 +152,26 @@ class DiscoverCard extends StatelessWidget {
 // Supporting widgets
 // ---------------------------------------------------------------------------
 
-class _AvatarPlaceholder extends StatelessWidget {
-  const _AvatarPlaceholder({required this.initial});
+/// Full coral→purple gradient background shown when avatar_url is null.
+class _GradientBackground extends StatelessWidget {
+  const _GradientBackground({required this.initial});
 
   final String initial;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [AppColors.primary, AppColors.accent],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       alignment: Alignment.center,
       child: Text(
         initial,
-        style: const TextStyle(
+        style: GoogleFonts.playfairDisplay(
           fontSize: 96,
           fontWeight: FontWeight.w700,
           color: Colors.white,
@@ -199,25 +181,42 @@ class _AvatarPlaceholder extends StatelessWidget {
   }
 }
 
-class _Badge extends StatelessWidget {
-  const _Badge({
-    required this.label,
-    required this.color,
-  });
+class _AffinityBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        'Alta afinidad',
+        style: GoogleFonts.dmSans(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+}
 
-  final String label;
-  final Color color;
+class _SharedInterestsBadge extends StatelessWidget {
+  const _SharedInterestsBadge({required this.count});
+
+  final int count;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color,
+        color: AppColors.accent.withValues(alpha: 0.85),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        label,
+        '$count intereses en común',
         style: AppTypography.bodySmall.copyWith(
           color: AppColors.textPrimary,
           fontWeight: FontWeight.w600,

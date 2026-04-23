@@ -1,6 +1,7 @@
 import 'package:appinio_swiper/appinio_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_typography.dart';
@@ -157,7 +158,11 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       centerTitle: true,
       title: Text(
         'Descubrir',
-        style: AppTypography.headlineMedium,
+        style: GoogleFonts.dmSans(
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: AppColors.textPrimary,
+        ),
       ),
     );
   }
@@ -265,20 +270,13 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       children: [
         SkipActionButton(
           size: 56,
-          onPressed: () {
-            _swiperController.swipeLeft();
-          },
+          onPressed: () => _swiperController.swipeLeft(),
         ),
         const SizedBox(width: 40),
         LikeActionButton(
-          size: 70,
-          onPressed: () {
-            _swiperController.swipeRight();
-          },
+          size: 72,
+          onPressed: () => _swiperController.swipeRight(),
         ),
-        const SizedBox(width: 40),
-        // Placeholder spacing to visually balance the row.
-        const SizedBox(width: 56, height: 56),
       ],
     );
   }

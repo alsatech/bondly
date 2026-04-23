@@ -6,7 +6,7 @@ import '../../features/auth/presentation/providers/auth_notifier.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
-import '../../features/discover/presentation/screens/discover_screen.dart';
+import '../layout/home_shell.dart';
 
 // ---------------------------------------------------------------------------
 // Route names
@@ -17,6 +17,11 @@ abstract final class AppRoutes {
   static const login = '/auth/login';
   static const register = '/auth/register';
   static const home = '/home';
+
+  // Logical sub-routes (documented; navigation is handled by HomeShell index).
+  // TECH_DEBT: Migrate to StatefulShellRoute for deep-link support.
+  static const feed = '/home/feed';
+  static const discover = '/home/discover';
 }
 
 // ---------------------------------------------------------------------------
@@ -75,7 +80,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: AppRoutes.home,
         pageBuilder: (context, state) => _fadeTransition(
           state: state,
-          child: const DiscoverScreen(),
+          child: const HomeShell(),
         ),
       ),
     ],
