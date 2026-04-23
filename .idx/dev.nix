@@ -38,6 +38,13 @@
             "0.0.0.0"
             "--web-port"
             "$PORT"
+            # Firebase Studio serves the preview over HTTPS but the Flutter
+            # debug client opens an insecure ws:// connection for hot reload,
+            # which browsers block as mixed content — leaves the page blank.
+            # Profile mode skips the injected debug client.
+            # TECH_DEBT: re-enable debug hot reload once Firebase Studio
+            # supports WSS forwarding to the preview port.
+            "--profile"
           ];
           manager = "flutter";
         };
