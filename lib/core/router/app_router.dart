@@ -6,6 +6,7 @@ import '../../features/auth/presentation/providers/auth_notifier.dart';
 import '../../features/auth/presentation/screens/login_screen.dart';
 import '../../features/auth/presentation/screens/register_screen.dart';
 import '../../features/auth/presentation/screens/splash_screen.dart';
+import '../../features/posts/presentation/screens/create_post_screen.dart';
 import '../layout/home_shell.dart';
 
 // ---------------------------------------------------------------------------
@@ -22,6 +23,9 @@ abstract final class AppRoutes {
   // TECH_DEBT: Migrate to StatefulShellRoute for deep-link support.
   static const feed = '/home/feed';
   static const discover = '/home/discover';
+
+  // Create post
+  static const createPost = '/home/create-post';
 }
 
 // ---------------------------------------------------------------------------
@@ -83,6 +87,13 @@ final routerProvider = Provider<GoRouter>((ref) {
           child: const HomeShell(),
         ),
       ),
+      GoRoute(
+        path: AppRoutes.createPost,
+        pageBuilder: (context, state) => _slideFromBottomTransition(
+          state: state,
+          child: const CreatePostScreen(),
+        ),
+      ),
     ],
     errorBuilder: (context, state) => Scaffold(
       body: Center(
@@ -133,6 +144,28 @@ CustomTransitionPage<void> _slideTransition({
           position: animation.drive(tween),
           child: child,
         ),
+      );
+    },
+  );
+}
+
+CustomTransitionPage<void> _slideFromBottomTransition({
+  required GoRouterState state,
+  required Widget child,
+}) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 350),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      final tween = Tween(
+        begin: const Offset(0.0, 1.0),
+        end: Offset.zero,
+      ).chain(CurveTween(curve: Curves.easeOutCubic));
+
+      return SlideTransition(
+        position: animation.drive(tween),
+        child: child,
       );
     },
   );

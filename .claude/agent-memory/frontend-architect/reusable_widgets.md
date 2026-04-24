@@ -1,6 +1,6 @@
 ---
 name: Reusable Widgets
-description: Shared and auth-specific widgets created in the Bondly frontend
+description: Shared and feature-specific widgets created in the Bondly frontend
 type: reference
 ---
 
@@ -53,3 +53,23 @@ Props: totalSteps, currentStep
 ### InterestChip (interest_chip.dart)
 Selectable chip with animated border/color toggle.
 Props: label, isSelected, onTap
+
+## Posts / Create Post widgets (lib/features/posts/presentation/widgets/)
+
+### MediaPickerSection (media_picker_section.dart)
+Shows empty dashed zone or horizontal thumbnail grid.
+Props: mediaFiles, onAdd, onRemove, enabled.
+Exports `pickMediaFiles(context)` async helper that shows a bottom sheet for gallery/camera selection.
+
+### BrandChipsSelector (brand_chips_selector.dart)
+ConsumerWidget — watches `brandsProvider`. Renders FilterChip Wrap (multiselect).
+Props: selectedIds (Set<String>), onChanged, enabled.
+Loading: small CircularProgressIndicator. Error: "No se pudieron cargar marcas" + reintentar.
+
+### SaleSection (sale_section.dart)
+Sale-specific fields: price TextField (numeric → cents on submit), product type DropdownButtonFormField, isFree SwitchListTile.
+Props: priceController, selectedProductType, isFree, onProductTypeChanged, onIsFreeChanged, enabled.
+
+### LocationMusicSection (location_music_section.dart)
+Two TextFields for location (name + area) and two for music (name + artist).
+Props: 4 controllers, enabled.

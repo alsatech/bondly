@@ -9,11 +9,13 @@ class PostActionsRow extends StatelessWidget {
     super.key,
     required this.likesCount,
     required this.hasLiked,
+    required this.commentsCount,
     required this.onLikeTap,
   });
 
   final int likesCount;
   final bool hasLiked;
+  final int commentsCount;
   final VoidCallback onLikeTap;
 
   @override
@@ -29,9 +31,10 @@ class PostActionsRow extends StatelessWidget {
             onTap: onLikeTap,
           ),
           const SizedBox(width: 16),
-          // Comment — no-op (no comments module yet).
-          _NoopIconButton(
+          // Comment count — no-op tap (no comments module yet).
+          _CountIconButton(
             icon: Icons.chat_bubble_outline_rounded,
+            count: commentsCount,
             onTap: () => SnackHelper.showSuccess(context, 'Próximamente'),
           ),
           const SizedBox(width: 16),
@@ -117,5 +120,47 @@ class _NoopIconButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Icon(icon, color: AppColors.textSecondary, size: 22),
     );
+  }
+}
+
+class _CountIconButton extends StatelessWidget {
+  const _CountIconButton({
+    required this.icon,
+    required this.count,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: AppColors.textSecondary, size: 22),
+          if (count > 0) ...[
+            const SizedBox(width: 4),
+            Text(
+              _formatCount(count),
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _formatCount(int count) {
+    if (count >= 1000) return '${(count / 1000).toStringAsFixed(1)}k';
+    return count.toString();
   }
 }

@@ -29,4 +29,7 @@ abstract final class ApiEndpoints {
 
   // Notifications
   static const String notifications = '/api/v1/notifications';
+
+  // Brands
+  static const String brands = '/api/v1/brands';
 }

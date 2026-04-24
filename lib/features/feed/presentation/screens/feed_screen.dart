@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constants/app_colors.dart';
+import '../../../../../core/router/app_router.dart';
 import '../../../../../shared/widgets/bondly_button.dart';
 import '../../../../../shared/widgets/snack_helper.dart';
 import '../../data/models/post.dart';
@@ -69,6 +71,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       body: SafeArea(
         child: _buildBody(feedState),
       ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: 'create_post_fab',
+        onPressed: _openCreatePost,
+        backgroundColor: AppColors.primary,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
   }
 
@@ -201,6 +211,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       await ref.read(feedNotifierProvider.notifier).toggleLike(postId);
     } on FeedFailure catch (e) {
       if (mounted) SnackHelper.showError(context, e.message);
+    }
+  }
+
+  Future<void> _openCreatePost() async {
+    final result = await context.push<dynamic>(AppRoutes.createPost);
+    if (result != null && mounted) {
+      // New post returned — refresh the feed so it appears at the top.
+      ref.read(feedNotifierProvider.notifier).refresh();
     }
   }
 }

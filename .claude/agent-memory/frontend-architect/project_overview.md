@@ -6,7 +6,7 @@ type: project
 
 Bondly is a dating + social app (ages 17–34, Americas). Flutter MVP with dark theme only.
 
-**Stack**: Flutter + Riverpod (NotifierProvider) + Dio + GoRouter + flutter_secure_storage + google_fonts + shimmer + image_picker + cached_network_image + equatable
+**Stack**: Flutter + Riverpod (NotifierProvider) + Dio + GoRouter + flutter_secure_storage + google_fonts + shimmer + image_picker + url_launcher + cached_network_image + equatable
 
 **Base URL (dev)**: `https://such-platypus-pox.ngrok-free.dev`
 - Always add header `ngrok-skip-browser-warning: true` in Dio BaseOptions
@@ -17,7 +17,11 @@ Bondly is a dating + social app (ages 17–34, Americas). Flutter MVP with dark 
 
 **Fonts**: Playfair Display (headlines/display), DM Sans (body/UI) — via google_fonts.
 
-**Current state**: Auth module complete (splash, login, register multi-step). Discover (matching) module complete — swipe stack on /home. Other features not yet started.
+**Current state**: Auth module complete (splash, login, register multi-step). Discover (matching) module complete. Feed module complete with PostCard extended to show location/music/badges. Create Post module complete at /home/create-post.
+
+**SwitchListTile deprecation**: Use `activeThumbColor` + `activeTrackColor` instead of `activeColor` (deprecated after v3.31.0). Use `withValues(alpha:)` instead of `withOpacity`.
+
+**DropdownButtonFormField deprecation**: Use `initialValue` instead of `value` (deprecated after v3.33.0).
 
 **Why:** MVP scope — dark only, no over-engineering, strict feature-first folder structure.
 **How to apply:** Always verify theme is dark-only. No light theme variants. Read skills.md before any new screen.
