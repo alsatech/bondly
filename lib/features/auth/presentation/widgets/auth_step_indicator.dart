@@ -21,13 +21,15 @@ class AuthStepIndicator extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
             curve: Curves.easeOutCubic,
-            height: 4,
+            height: 2,
             margin: EdgeInsets.only(right: index < totalSteps - 1 ? 6 : 0),
             decoration: BoxDecoration(
-              color: isCompleted || isActive
-                  ? AppColors.primary
-                  : AppColors.border,
-              borderRadius: BorderRadius.circular(2),
+              color: isCompleted
+                  ? AppColors.gold
+                  : isActive
+                      ? AppColors.gold.withValues(alpha: 0.6)
+                      : AppColors.border,
+              borderRadius: BorderRadius.circular(1),
             ),
           ),
         );

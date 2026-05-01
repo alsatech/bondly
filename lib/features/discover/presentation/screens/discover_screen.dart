@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_typography.dart';
 import '../../../../shared/widgets/bondly_button.dart';
 import '../../../../shared/widgets/snack_helper.dart';
 import '../../data/models/discovery_candidate.dart';
 import '../../domain/discover_failure.dart';
 import '../providers/discover_notifier.dart';
 import '../providers/discover_providers.dart';
-import '../widgets/discover_action_button.dart' show LikeActionButton, SkipActionButton;
+import '../widgets/discover_action_button.dart'
+    show ActionRowLabel, LikeActionButton, SkipActionButton, SuperLikeActionButton;
 import '../widgets/discover_card.dart';
 import '../widgets/discover_empty_state.dart';
 import '../widgets/discover_shimmer.dart';
@@ -135,26 +135,42 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       backgroundColor: AppColors.background,
       elevation: 0,
       scrolledUnderElevation: 0,
-      centerTitle: true,
-      title: Text(
-        'Discover',
-        style: GoogleFonts.playfairDisplay(
-          fontSize: 22,
-          fontWeight: FontWeight.w700,
-          color: AppColors.textPrimary,
-          letterSpacing: -0.3,
-        ),
+      centerTitle: false,
+      titleSpacing: 24,
+      title: Row(
+        children: [
+          Text(
+            'discover',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              fontStyle: FontStyle.italic,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            '.',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 22,
+              fontWeight: FontWeight.w700,
+              color: AppColors.gold,
+              letterSpacing: -0.3,
+            ),
+          ),
+        ],
       ),
       actions: [
         IconButton(
           icon: const Icon(
             Icons.tune_rounded,
             color: AppColors.textSecondary,
-            size: 22,
+            size: 20,
           ),
           onPressed: () => SnackHelper.showSuccess(context, 'Proximamente'),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
       ],
     );
   }
@@ -190,22 +206,35 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             const Icon(
               Icons.wifi_off_rounded,
               color: AppColors.textSecondary,
-              size: 64,
+              size: 44,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
+            Text(
+              'Something went wrong.',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.3,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 10),
             Text(
               failure.message,
-              style: AppTypography.bodyLarge.copyWith(
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
                 color: AppColors.textSecondary,
+                height: 1.55,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 32),
             BondlyButton(
-              label: 'Retry',
+              label: 'TRY AGAIN',
               onPressed: () =>
                   ref.read(discoverNotifierProvider.notifier).loadInitial(),
-              variant: BondlyButtonVariant.primary,
+              variant: BondlyButtonVariant.outline,
               minimumSize: const Size(200, 50),
             ),
           ],
@@ -244,27 +273,39 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
           ),
         ),
-        const SizedBox(height: 12),
+        const SizedBox(height: 16),
         _buildActionRow(size),
-        const SizedBox(height: 28),
+        const SizedBox(height: 24),
       ],
     );
   }
 
   Widget _buildActionRow(Size size) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SkipActionButton(
-          size: 58,
-          onPressed: () => _swiperController.swipeLeft(),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SkipActionButton(
+              size: 54,
+              onPressed: () => _swiperController.swipeLeft(),
+            ),
+            const SizedBox(width: 20),
+            SuperLikeActionButton(
+              size: 50,
+              onPressed: () => SnackHelper.showSuccess(context, 'Coming soon'),
+            ),
+            const SizedBox(width: 20),
+            LikeActionButton(
+              size: 68,
+              onPressed: () => _swiperController.swipeRight(),
+            ),
+          ],
         ),
-        const SizedBox(width: 36),
-        LikeActionButton(
-          size: 74,
-          onPressed: () => _swiperController.swipeRight(),
-        ),
+        const SizedBox(height: 10),
+        const ActionRowLabel(),
       ],
     );
   }

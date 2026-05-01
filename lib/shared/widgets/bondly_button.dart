@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
-import '../../core/constants/app_typography.dart';
 
 enum BondlyButtonVariant { primary, accent, outline, ghost }
 
@@ -61,6 +61,8 @@ class BondlyButton extends StatelessWidget {
 // Variants
 // ---------------------------------------------------------------------------
 
+/// Primary — dark warm/gold tinted background, uppercase spaced label with star flankers.
+/// Matches the "ENTER THE ROOM" / "CREATE ACCOUNT" style from design refs.
 class _PrimaryButton extends StatelessWidget {
   const _PrimaryButton({
     required this.label,
@@ -78,43 +80,92 @@ class _PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: onPressed != null
-            ? AppColors.primaryGradient
-            : null,
-        color: onPressed == null ? AppColors.border : null,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: ElevatedButton(
-        onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent,
-          foregroundColor: AppColors.textPrimary,
-          minimumSize: minimumSize,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+    final enabled = onPressed != null && !isLoading;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(10),
+        splashColor: AppColors.gold.withValues(alpha: 0.12),
+        highlightColor: AppColors.gold.withValues(alpha: 0.06),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          constraints: BoxConstraints(
+            minWidth: minimumSize.width,
+            minHeight: minimumSize.height,
           ),
-          elevation: 0,
-          shadowColor: Colors.transparent,
+          decoration: BoxDecoration(
+            color: enabled
+                ? const Color(0xFF2B2318) // warm dark gold-tinted
+                : AppColors.border,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: enabled
+                  ? AppColors.gold.withValues(alpha: 0.35)
+                  : AppColors.border,
+              width: 1.0,
+            ),
+          ),
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          child: isLoading
+              ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2.0,
+                    color: AppColors.gold,
+                  ),
+                )
+              : icon != null
+                  ? Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [icon!, const SizedBox(width: 8), _ButtonLabel(label)],
+                    )
+                  : _ButtonLabel(label),
         ),
-        child: isLoading
-            ? const SizedBox(
-                width: 22,
-                height: 22,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.5,
-                  color: AppColors.textPrimary,
-                ),
-              )
-            : Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (icon != null) ...[icon!, const SizedBox(width: 8)],
-                  Text(label, style: AppTypography.buttonText),
-                ],
-              ),
       ),
+    );
+  }
+}
+
+class _ButtonLabel extends StatelessWidget {
+  const _ButtonLabel(this.text);
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          '★',
+          style: GoogleFonts.dmSans(
+            fontSize: 12,
+            color: AppColors.gold,
+            letterSpacing: 0,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          text.toUpperCase(),
+          style: GoogleFonts.dmSans(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.gold,
+            letterSpacing: 2.0,
+          ),
+        ),
+        const SizedBox(width: 10),
+        Text(
+          '★',
+          style: GoogleFonts.dmSans(
+            fontSize: 12,
+            color: AppColors.gold,
+            letterSpacing: 0,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -143,16 +194,16 @@ class _AccentButton extends StatelessWidget {
         foregroundColor: AppColors.textPrimary,
         minimumSize: minimumSize,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(10),
         ),
         elevation: 0,
       ),
       child: isLoading
           ? const SizedBox(
-              width: 22,
-              height: 22,
+              width: 20,
+              height: 20,
               child: CircularProgressIndicator(
-                strokeWidth: 2.5,
+                strokeWidth: 2.0,
                 color: AppColors.textPrimary,
               ),
             )
@@ -160,13 +211,22 @@ class _AccentButton extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
-                Text(label, style: AppTypography.buttonText),
+                Text(
+                  label,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    letterSpacing: 0.3,
+                  ),
+                ),
               ],
             ),
     );
   }
 }
 
+/// Outline — subtle border, gold text, for secondary actions like "Skip for now".
 class _OutlineButton extends StatelessWidget {
   const _OutlineButton({
     required this.label,
@@ -187,27 +247,35 @@ class _OutlineButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        foregroundColor: AppColors.textPrimary,
+        foregroundColor: AppColors.gold,
         minimumSize: minimumSize,
-        side: const BorderSide(color: AppColors.border, width: 1.5),
+        side: BorderSide(color: AppColors.gold.withValues(alpha: 0.4), width: 1.0),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
       child: isLoading
-          ? const SizedBox(
-              width: 22,
-              height: 22,
+          ? SizedBox(
+              width: 20,
+              height: 20,
               child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                color: AppColors.primary,
+                strokeWidth: 2.0,
+                color: AppColors.gold,
               ),
             )
           : Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (icon != null) ...[icon!, const SizedBox(width: 8)],
-                Text(label, style: AppTypography.buttonText),
+                Text(
+                  label,
+                  style: GoogleFonts.dmSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.gold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
               ],
             ),
     );
@@ -233,7 +301,13 @@ class _GhostButton extends StatelessWidget {
         foregroundColor: AppColors.textSecondary,
         minimumSize: minimumSize,
       ),
-      child: Text(label, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+      child: Text(
+        label,
+        style: GoogleFonts.dmSans(
+          fontSize: 14,
+          color: AppColors.textSecondary,
+        ),
+      ),
     );
   }
 }

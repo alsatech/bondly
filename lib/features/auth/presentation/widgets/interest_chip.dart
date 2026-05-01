@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_typography.dart';
 
 class InterestChip extends StatelessWidget {
   const InterestChip({
@@ -16,27 +16,31 @@ class InterestChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeOut,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : AppColors.card,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected ? AppColors.primary : AppColors.border,
-              width: isSelected ? 1.5 : 1,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.gold.withValues(alpha: 0.12)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.gold.withValues(alpha: 0.55)
+                : AppColors.border,
+            width: 1.0,
           ),
-          child: Text(
-            label,
-            style: AppTypography.labelMedium.copyWith(
-              color: isSelected ? AppColors.primary : AppColors.textSecondary,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-            ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.dmSans(
+            fontSize: 12,
+            color: isSelected ? AppColors.gold : AppColors.textSecondary,
+            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+            letterSpacing: 0.2,
           ),
         ),
       ),

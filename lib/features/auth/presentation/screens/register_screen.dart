@@ -2,10 +2,10 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/app_colors.dart';
-import '../../../../core/constants/app_typography.dart';
 import '../../../../shared/widgets/bondly_button.dart';
 import '../../../../shared/widgets/bondly_text_field.dart';
 import '../../../../shared/widgets/snack_helper.dart';
@@ -50,11 +50,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   // Step 1 — Basic data
   final _step1FormKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _ageController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   String _selectedGender = '';
+  bool _termsAccepted = false;
 
   // Step 2 — Profile photo
   File? _profilePhoto;
@@ -87,6 +89,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   void dispose() {
     _stepController.dispose();
     _nameController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _ageController.dispose();
     _passwordController.dispose();
@@ -103,6 +106,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       if (!(_step1FormKey.currentState?.validate() ?? false)) return;
       if (_selectedGender.isEmpty) {
         SnackHelper.showError(context, 'Selecciona tu género.');
+        return;
+      }
+      if (!_termsAccepted) {
+        SnackHelper.showError(context, 'Accept the Terms & Privacy to continue.');
         return;
       }
     }
@@ -187,21 +194,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        leading: _currentStep > 0
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
-                onPressed: isLoading ? null : _prevStep,
-              )
-            : null,
-        title: AuthStepIndicator(
-          totalSteps: _totalSteps,
-          currentStep: _currentStep,
-        ),
-        titleSpacing: _currentStep > 0 ? 0 : 24,
-        actions: const [SizedBox(width: 48)],
-      ),
+      appBar: _buildAppBar(isLoading),
       body: SafeArea(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -214,17 +207,44 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     );
   }
 
+  PreferredSizeWidget _buildAppBar(bool isLoading) {
+    return AppBar(
+      backgroundColor: AppColors.background,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      leading: _currentStep > 0
+          ? IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: isLoading ? null : _prevStep,
+            )
+          : null,
+      title: AuthStepIndicator(
+        totalSteps: _totalSteps,
+        currentStep: _currentStep,
+      ),
+      titleSpacing: _currentStep > 0 ? 0 : 24,
+      actions: const [SizedBox(width: 48)],
+    );
+  }
+
   Widget _buildCurrentStep(bool isLoading) {
     return switch (_currentStep) {
       0 => _Step1BasicData(
           formKey: _step1FormKey,
           nameController: _nameController,
+          usernameController: _usernameController,
           emailController: _emailController,
           ageController: _ageController,
           passwordController: _passwordController,
           confirmPasswordController: _confirmPasswordController,
           selectedGender: _selectedGender,
           onGenderChanged: (g) => setState(() => _selectedGender = g),
+          termsAccepted: _termsAccepted,
+          onTermsChanged: (v) => setState(() => _termsAccepted = v ?? false),
           isLoading: isLoading,
           onNext: _nextStep,
         ),
@@ -262,98 +282,192 @@ class _Step1BasicData extends StatelessWidget {
   const _Step1BasicData({
     required this.formKey,
     required this.nameController,
+    required this.usernameController,
     required this.emailController,
     required this.ageController,
     required this.passwordController,
     required this.confirmPasswordController,
     required this.selectedGender,
     required this.onGenderChanged,
+    required this.termsAccepted,
+    required this.onTermsChanged,
     required this.isLoading,
     required this.onNext,
   });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController nameController;
+  final TextEditingController usernameController;
   final TextEditingController emailController;
   final TextEditingController ageController;
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
   final String selectedGender;
   final void Function(String) onGenderChanged;
+  final bool termsAccepted;
+  final void Function(bool?) onTermsChanged;
   final bool isLoading;
   final VoidCallback onNext;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
       child: Form(
         key: formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 24),
-            Text('Cuéntanos sobre ti', style: AppTypography.displayMedium),
-            const SizedBox(height: 6),
+            // ── Hero copy ──────────────────────────────────────────────────
             Text(
-              'Paso 1 de 3 — Datos básicos',
-              style: AppTypography.bodySmall,
+              '§ CREATE YOUR ACCOUNT',
+              style: GoogleFonts.dmSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: AppColors.gold,
+                letterSpacing: 2.0,
+              ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 16),
+            Text(
+              'Join the',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 40,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                height: 1.1,
+                letterSpacing: -0.5,
+              ),
+            ),
+            Text(
+              'circle.',
+              style: GoogleFonts.playfairDisplay(
+                fontSize: 40,
+                fontWeight: FontWeight.w700,
+                fontStyle: FontStyle.italic,
+                color: AppColors.gold,
+                height: 1.1,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 14),
+            Text(
+              'Free to join. Bond with people, places and\nmoments worth keeping.',
+              style: GoogleFonts.dmSans(
+                fontSize: 13,
+                color: AppColors.textSecondary,
+                height: 1.55,
+              ),
+            ),
+            const SizedBox(height: 36),
 
+            // ── Fields ────────────────────────────────────────────────────
             BondlyTextField(
               controller: nameController,
-              label: 'Nombre completo',
-              hint: 'Tu nombre',
-              prefixIcon: const Icon(Icons.person_outline),
+              label: 'FULL NAME',
+              hint: 'Soren Vail',
               textInputAction: TextInputAction.next,
               enabled: !isLoading,
               validator: (v) {
-                if (v == null || v.trim().isEmpty) return 'Ingresa tu nombre.';
-                if (v.trim().length < 2) return 'Mínimo 2 caracteres.';
+                if (v == null || v.trim().isEmpty) return 'Enter your name.';
+                if (v.trim().length < 2) return 'Minimum 2 characters.';
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
+
+            BondlyTextField(
+              controller: usernameController,
+              label: 'USERNAME',
+              hint: 'soren.vail',
+              prefixText: '@  ',
+              textInputAction: TextInputAction.next,
+              enabled: !isLoading,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) return 'Enter a username.';
+                if (v.trim().length < 3) return 'Minimum 3 characters.';
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
 
             BondlyTextField(
               controller: emailController,
-              label: 'Correo electrónico',
-              hint: 'tu@email.com',
-              prefixIcon: const Icon(Icons.email_outlined),
+              label: 'E-MAIL',
+              hint: 'you@quiet.studio',
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
               enabled: !isLoading,
               validator: (v) {
-                if (v == null || v.isEmpty) return 'Ingresa tu correo.';
+                if (v == null || v.isEmpty) return 'Enter your email.';
                 if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
-                  return 'Correo no válido.';
+                  return 'Invalid email.';
                 }
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
 
+            // Age field (hidden but required for backend)
             BondlyTextField(
               controller: ageController,
-              label: 'Edad',
-              hint: 'Tu edad',
-              prefixIcon: const Icon(Icons.cake_outlined),
+              label: 'AGE',
+              hint: '24',
               keyboardType: TextInputType.number,
               textInputAction: TextInputAction.next,
               enabled: !isLoading,
               validator: (v) {
                 final age = int.tryParse(v ?? '');
-                if (age == null) return 'Ingresa tu edad.';
-                if (age < 18 || age > 100) return 'Debes tener entre 18 y 100.';
+                if (age == null) return 'Enter your age.';
+                if (age < 18 || age > 100) return 'Must be between 18 and 100.';
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+
+            BondlyTextField(
+              controller: passwordController,
+              label: 'PASSWORD',
+              hint: 'At least 8 characters',
+              isPassword: true,
+              textInputAction: TextInputAction.next,
+              enabled: !isLoading,
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Enter a password.';
+                if (v.length < 8) return 'Minimum 8 characters.';
+                if (!v.contains(RegExp(r'[A-Z]'))) return 'Include one uppercase letter.';
+                if (!v.contains(RegExp(r'[a-z]'))) return 'Include one lowercase letter.';
+                if (!v.contains(RegExp(r'\d'))) return 'Include one number.';
+                return null;
+              },
+            ),
+            const SizedBox(height: 24),
+
+            BondlyTextField(
+              controller: confirmPasswordController,
+              label: 'CONFIRM PASSWORD',
+              hint: 'Repeat password',
+              isPassword: true,
+              textInputAction: TextInputAction.done,
+              enabled: !isLoading,
+              validator: (v) {
+                if (v != passwordController.text) return 'Passwords do not match.';
                 return null;
               },
             ),
             const SizedBox(height: 20),
 
-            // Gender selector
-            Text('Género', style: AppTypography.labelLarge),
-            const SizedBox(height: 10),
+            // Gender selector — minimal pill chips
+            Text(
+              'GENDER',
+              style: GoogleFonts.dmSans(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+                letterSpacing: 1.4,
+              ),
+            ),
+            const SizedBox(height: 12),
             Wrap(
               spacing: 10,
               runSpacing: 10,
@@ -362,75 +476,127 @@ class _Step1BasicData extends StatelessWidget {
                 return GestureDetector(
                   onTap: isLoading ? null : () => onGenderChanged(gender),
                   child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    duration: const Duration(milliseconds: 180),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary.withValues(alpha: 0.2) : AppColors.card,
-                      borderRadius: BorderRadius.circular(20),
+                      color: isSelected
+                          ? AppColors.gold.withValues(alpha: 0.12)
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(6),
                       border: Border.all(
-                        color: isSelected ? AppColors.primary : AppColors.border,
-                        width: isSelected ? 1.5 : 1,
+                        color: isSelected
+                            ? AppColors.gold.withValues(alpha: 0.55)
+                            : AppColors.border,
+                        width: 1.0,
                       ),
                     ),
                     child: Text(
                       gender,
-                      style: AppTypography.labelMedium.copyWith(
-                        color: isSelected ? AppColors.primary : AppColors.textSecondary,
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        color: isSelected ? AppColors.gold : AppColors.textSecondary,
                         fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 20),
-
-            BondlyTextField(
-              controller: passwordController,
-              label: 'Contraseña',
-              hint: '8+ chars, con mayúscula, minúscula y número',
-              isPassword: true,
-              prefixIcon: const Icon(Icons.lock_outline),
-              textInputAction: TextInputAction.next,
-              enabled: !isLoading,
-              validator: (v) {
-                if (v == null || v.isEmpty) return 'Ingresa una contraseña.';
-                if (v.length < 8) return 'Mínimo 8 caracteres.';
-                if (!v.contains(RegExp(r'[A-Z]'))) {
-                  return 'Incluye al menos una mayúscula.';
-                }
-                if (!v.contains(RegExp(r'[a-z]'))) {
-                  return 'Incluye al menos una minúscula.';
-                }
-                if (!v.contains(RegExp(r'\d'))) {
-                  return 'Incluye al menos un número.';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-
-            BondlyTextField(
-              controller: confirmPasswordController,
-              label: 'Confirmar contraseña',
-              hint: 'Repite tu contraseña',
-              isPassword: true,
-              prefixIcon: const Icon(Icons.lock_outline),
-              textInputAction: TextInputAction.done,
-              enabled: !isLoading,
-              validator: (v) {
-                if (v != passwordController.text) return 'Las contraseñas no coinciden.';
-                return null;
-              },
-            ),
             const SizedBox(height: 32),
 
+            // ── Terms checkbox ─────────────────────────────────────────────
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: Checkbox(
+                    value: termsAccepted,
+                    onChanged: isLoading ? null : onTermsChanged,
+                    activeColor: AppColors.gold,
+                    checkColor: AppColors.background,
+                    side: BorderSide(
+                      color: AppColors.border,
+                      width: 1.0,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3),
+                    ),
+                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.dmSans(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                      ),
+                      children: [
+                        const TextSpan(text: "I agree to Bondly's "),
+                        TextSpan(
+                          text: 'Terms',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            color: AppColors.gold,
+                          ),
+                        ),
+                        const TextSpan(text: ' & '),
+                        TextSpan(
+                          text: 'Privacy',
+                          style: GoogleFonts.dmSans(
+                            fontSize: 12,
+                            color: AppColors.gold,
+                          ),
+                        ),
+                        const TextSpan(text: '.'),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 28),
+
+            // ── CTA ───────────────────────────────────────────────────────
             BondlyButton(
-              label: 'Continuar',
+              label: 'CREATE ACCOUNT',
               onPressed: isLoading ? null : onNext,
               isLoading: isLoading,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 28),
+
+            // ── Already a member row ───────────────────────────────────────
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'ALREADY A MEMBER?',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 1.6,
+                  ),
+                ),
+                Builder(builder: (context) {
+                  return GestureDetector(
+                    onTap: () => Navigator.of(context).maybePop(),
+                    child: Text(
+                      'Sign in →',
+                      style: GoogleFonts.playfairDisplay(
+                        fontSize: 14,
+                        fontStyle: FontStyle.italic,
+                        color: AppColors.gold,
+                      ),
+                    ),
+                  );
+                }),
+              ],
+            ),
           ],
         ),
       ),
@@ -460,16 +626,38 @@ class _Step2Photo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 24),
-          Text('Tu foto de perfil', style: AppTypography.displayMedium),
-          const SizedBox(height: 6),
           Text(
-            'Paso 2 de 3 — Una buena foto aumenta tus matches.',
-            style: AppTypography.bodySmall,
+            '§ YOUR PHOTO',
+            style: GoogleFonts.dmSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColors.gold,
+              letterSpacing: 2.0,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Show your\nface.',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 40,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+              height: 1.1,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'A good photo increases your chances\nof connecting with others.',
+            style: GoogleFonts.dmSans(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+              height: 1.55,
+            ),
           ),
           const SizedBox(height: 48),
 
@@ -479,14 +667,16 @@ class _Step2Photo extends StatelessWidget {
               onTap: isLoading || isPhotoLoading ? null : onPickPhoto,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                width: 180,
-                height: 180,
+                width: 160,
+                height: 160,
                 decoration: BoxDecoration(
                   color: AppColors.card,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: profilePhoto != null ? AppColors.primary : AppColors.border,
-                    width: profilePhoto != null ? 2.5 : 1.5,
+                    color: profilePhoto != null
+                        ? AppColors.gold.withValues(alpha: 0.6)
+                        : AppColors.border,
+                    width: 1.5,
                   ),
                   image: profilePhoto != null
                       ? DecorationImage(
@@ -497,8 +687,8 @@ class _Step2Photo extends StatelessWidget {
                   boxShadow: profilePhoto != null
                       ? [
                           BoxShadow(
-                            color: AppColors.primary.withValues(alpha: 0.3),
-                            blurRadius: 20,
+                            color: AppColors.gold.withValues(alpha: 0.15),
+                            blurRadius: 24,
                             offset: const Offset(0, 8),
                           )
                         ]
@@ -506,22 +696,25 @@ class _Step2Photo extends StatelessWidget {
                 ),
                 child: profilePhoto == null
                     ? isPhotoLoading
-                        ? const CircularProgressIndicator(
-                            strokeWidth: 2.5,
-                            color: AppColors.primary,
+                        ? CircularProgressIndicator(
+                            strokeWidth: 2.0,
+                            color: AppColors.gold,
                           )
                         : Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(
+                              Icon(
                                 Icons.add_a_photo_outlined,
                                 color: AppColors.textSecondary,
-                                size: 36,
+                                size: 30,
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                'Agregar foto',
-                                style: AppTypography.labelMedium,
+                                'Add photo',
+                                style: GoogleFonts.dmSans(
+                                  fontSize: 12,
+                                  color: AppColors.textSecondary,
+                                ),
                               ),
                             ],
                           )
@@ -529,31 +722,33 @@ class _Step2Photo extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           if (profilePhoto != null)
             Center(
               child: TextButton.icon(
                 onPressed: isLoading ? null : onPickPhoto,
-                icon: const Icon(Icons.edit_outlined, size: 16, color: AppColors.accent),
+                icon: Icon(Icons.edit_outlined, size: 14, color: AppColors.gold),
                 label: Text(
-                  'Cambiar foto',
-                  style: AppTypography.labelMedium.copyWith(color: AppColors.accent),
+                  'Change photo',
+                  style: GoogleFonts.dmSans(
+                    fontSize: 12,
+                    color: AppColors.gold,
+                  ),
                 ),
               ),
             ),
 
-          const SizedBox(height: 48),
+          const SizedBox(height: 52),
 
           BondlyButton(
-            label: profilePhoto != null ? 'Continuar' : 'Saltar por ahora',
+            label: profilePhoto != null ? 'CONTINUE' : 'SKIP FOR NOW',
             onPressed: isLoading ? null : onNext,
             isLoading: isLoading,
             variant: profilePhoto != null
                 ? BondlyButtonVariant.primary
                 : BondlyButtonVariant.outline,
           ),
-          const SizedBox(height: 32),
         ],
       ),
     );
@@ -580,16 +775,38 @@ class _Step3Interests extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.fromLTRB(28, 16, 28, 48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 24),
-          Text('¿Qué te apasiona?', style: AppTypography.displayMedium),
-          const SizedBox(height: 6),
           Text(
-            'Paso 3 de 3 — Selecciona al menos 3 intereses.',
-            style: AppTypography.bodySmall,
+            '§ YOUR PASSIONS',
+            style: GoogleFonts.dmSans(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: AppColors.gold,
+              letterSpacing: 2.0,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'What moves\nyou?',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 40,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+              height: 1.1,
+              letterSpacing: -0.5,
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            'Pick at least 3 interests. We use these\nto find your people.',
+            style: GoogleFonts.dmSans(
+              fontSize: 13,
+              color: AppColors.textSecondary,
+              height: 1.55,
+            ),
           ),
           const SizedBox(height: 32),
 
@@ -604,26 +821,27 @@ class _Step3Interests extends StatelessWidget {
               );
             }).toList(),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 28),
 
           // Selection counter
           if (selectedInterests.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Text(
-                '${selectedInterests.length} seleccionado${selectedInterests.length == 1 ? '' : 's'}',
-                style: AppTypography.labelMedium.copyWith(
-                  color: AppColors.primary,
+                '${selectedInterests.length} selected',
+                style: GoogleFonts.dmSans(
+                  fontSize: 12,
+                  color: AppColors.gold,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
 
           BondlyButton(
-            label: 'Crear mi perfil',
+            label: 'CREATE MY PROFILE',
             onPressed: isLoading ? null : onSubmit,
             isLoading: isLoading,
           ),
-          const SizedBox(height: 32),
         ],
       ),
     );

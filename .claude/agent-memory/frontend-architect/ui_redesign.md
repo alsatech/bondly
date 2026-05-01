@@ -64,8 +64,47 @@ Design references were in `design_refs/` (feed x4, post x5, profile x2; no disco
 
 ---
 
-## Untouched
+---
 
-- All auth screens (login, register, splash)
+## Redesign scope (2026-05-01) — Auth + Discover
+
+Design references: `design_refs/auth/` (loginPage.png, registerPage.png, registerPagebutton.png) and `design_refs/discover/swipe.png`.
+
+**Visual language established**: Dark bg, gold (`#C8A97E`) as the emotional accent replacing coral for auth screens. Underline-only input fields (no filled boxes). Uppercase spaced DM Sans labels. Playfair Display italic gold for last word of hero headlines. Dark warm-tinted CTA button with star flankers. Auth "ALREADY A MEMBER? / Sign in →" pattern.
+
+### Auth — Login (`lib/features/auth/presentation/screens/login_screen.dart`)
+- Removed logo icon; replaced with editorial text layout
+- Hero: "WELCOME BACK, MEMBER." eyebrow → "The room / is still / quiet." (last word in gold italic)
+- Sub-copy: "Sign in to find the people…"
+- Fields: underline-only, uppercase labels ("PHONE OR E-MAIL", "PASSPHRASE")
+- Inline italic "use a magic link instead" link top-right of password field
+- CTA: "ENTER THE ROOM" with star flankers (dark warm bg button)
+- Bottom link: "NOT A MEMBER? / Join us →"
+
+### Auth — Register (`lib/features/auth/presentation/screens/register_screen.dart`)
+- Step 1 hero: "§ CREATE YOUR ACCOUNT" eyebrow → "Join the / circle." (gold italic)
+- Added username field (collected in UI but not yet in RegisterRequest — backend doesn't accept it yet)
+- Terms checkbox with gold styled links
+- CTA: "CREATE ACCOUNT" with star flankers
+- Bottom: "ALREADY A MEMBER? / Sign in →"
+- Steps 2 & 3 also updated with matching eyebrow + hero pattern
+- Gender chips now use gold border/text when selected
+
+### Auth widgets
+- `auth_step_indicator.dart` — Step bars now use gold (height reduced to 2px from 4px)
+- `interest_chip.dart` — Selected state uses gold border/text instead of coral
+
+### Shared widgets
+- `bondly_button.dart` — Primary: dark warm bg (`#2B2318`) with gold star flankers + spaced uppercase label. Outline: gold border/text. Accent/Ghost unchanged in behavior.
+- `bondly_text_field.dart` — Underline-only style, uppercase spaced labels (10px letterSpacing 1.4), gold focus underline, added `prefixText` param for username @ prefix.
+
+### Discover
+- `discover_screen.dart` — AppBar: italic "discover." with gold dot; updated error state to Playfair headline
+- `discover_card.dart` — Refined gradient (3-stop), removed non-existent `age`/`city` fields, added bio tagline support, gender + isMutualFollow in meta row, "SWIPE TO CONNECT" label
+- `discover_action_button.dart` — Added `SuperLikeActionButton` (gold star), `ActionRowLabel` ("SWIPE UNTIL LATE"), reduced button sizes (skip 54, like 68)
+- `discover_empty_state.dart` — "The room is quiet for now." Playfair headline; plain explore icon (no gradient circle)
+
+### Untouched
 - All models, providers, repositories, services, API clients
-- GoRouter config (only `home_shell.dart` added the Profile tab; router itself unchanged)
+- GoRouter config, routing logic
+- Other features (feed, posts, profile, chat, events, notifications)
