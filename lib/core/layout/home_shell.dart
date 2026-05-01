@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../features/discover/presentation/screens/discover_screen.dart';
 import '../../features/feed/presentation/screens/feed_screen.dart';
+import '../../features/profile/presentation/screens/profile_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -23,13 +24,19 @@ class _HomeShellState extends State<HomeShell> {
     NavigationDestination(
       icon: Icon(Icons.explore_outlined),
       selectedIcon: Icon(Icons.explore_rounded),
-      label: 'Descubrir',
+      label: 'Discover',
+    ),
+    NavigationDestination(
+      icon: Icon(Icons.person_outline_rounded),
+      selectedIcon: Icon(Icons.person_rounded),
+      label: 'Profile',
     ),
   ];
 
   static const _screens = [
     FeedScreen(),
     DiscoverScreen(),
+    ProfileScreen(),
   ];
 
   @override
@@ -73,7 +80,7 @@ class _BottomNav extends StatelessWidget {
         selectedIndex: currentIndex,
         onDestinationSelected: onDestinationSelected,
         backgroundColor: AppColors.background,
-        indicatorColor: AppColors.primary.withValues(alpha: 0.15),
+        indicatorColor: AppColors.primary.withValues(alpha: 0.12),
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,

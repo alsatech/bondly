@@ -14,6 +14,7 @@ type: project
 | DiscoverScreen | `/home` | `lib/features/discover/presentation/screens/discover_screen.dart` |
 | FeedScreen | `/home` (tab 0 of HomeShell) | `lib/features/feed/presentation/screens/feed_screen.dart` |
 | CreatePostScreen | `/home/create-post` | `lib/features/posts/presentation/screens/create_post_screen.dart` |
+| ProfileScreen | `/home` (tab 2 of HomeShell) | `lib/features/profile/presentation/screens/profile_screen.dart` |
 
 ## Router config
 File: `lib/core/router/app_router.dart`

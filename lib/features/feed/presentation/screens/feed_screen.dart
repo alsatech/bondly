@@ -26,7 +26,6 @@ class FeedScreen extends ConsumerStatefulWidget {
 class _FeedScreenState extends ConsumerState<FeedScreen> {
   final ScrollController _scrollController = ScrollController();
 
-  /// Trigger pagination when within this many pixels of the bottom.
   static const double _paginationThreshold = 400;
 
   @override
@@ -56,13 +55,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Listen for like errors and surface them as snackbars.
-    ref.listen<FeedState>(feedNotifierProvider, (_, next) {
-      // Errors during pagination (non-replace) bubble up as rethrows in the
-      // notifier; the screen catches them here via a try/catch in _onScroll.
-      // Page-level errors transition state to FeedError and are shown inline.
-    });
-
     final feedState = ref.watch(feedNotifierProvider);
 
     return Scaffold(
@@ -71,12 +63,14 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       body: SafeArea(
         child: _buildBody(feedState),
       ),
+      // Create-post FAB — coral circle, bottom-right
       floatingActionButton: FloatingActionButton(
         heroTag: 'create_post_fab',
         onPressed: _openCreatePost,
         backgroundColor: AppColors.primary,
         shape: const CircleBorder(),
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+        elevation: 0,
+        child: const Icon(Icons.add_rounded, color: Colors.white, size: 26),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
     );
@@ -88,7 +82,7 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       FeedLoading() => const FeedShimmer(),
       FeedEmpty(activeTab: final tab) => Column(
           children: [
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             FeedTabs(
               activeTab: tab,
               onTabSelected: (t) =>
@@ -125,10 +119,10 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
       child: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          // Tabs
+          // Tabs pinned just under the app bar
           SliverToBoxAdapter(
             child: Padding(
-              padding: const EdgeInsets.only(top: 12, bottom: 8),
+              padding: const EdgeInsets.only(top: 10, bottom: 6),
               child: FeedTabs(
                 activeTab: activeTab,
                 onTabSelected: (t) =>
@@ -136,21 +130,18 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
               ),
             ),
           ),
-          // Posts
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverList.separated(
-              itemCount: posts.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final post = posts[index];
-                return PostCard(
-                  post: post,
-                  onLikeTap: () => _handleLike(post.id),
-                  onMenuTap: () => SnackHelper.showSuccess(context, 'Próximamente'),
-                );
-              },
-            ),
+          // Post cards — edge-to-edge, separated by a 1px divider drawn inside each card
+          SliverList.builder(
+            itemCount: posts.length,
+            itemBuilder: (context, index) {
+              final post = posts[index];
+              return PostCard(
+                post: post,
+                onLikeTap: () => _handleLike(post.id),
+                onMenuTap: () =>
+                    SnackHelper.showSuccess(context, 'Proximamente'),
+              );
+            },
           ),
           // Pagination indicator
           if (isPaginating)
@@ -160,12 +151,12 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
                 child: Center(
                   child: CircularProgressIndicator(
                     color: AppColors.primary,
-                    strokeWidth: 2.5,
+                    strokeWidth: 2,
                   ),
                 ),
               ),
             ),
-          const SliverToBoxAdapter(child: SizedBox(height: 16)),
+          const SliverToBoxAdapter(child: SizedBox(height: 80)),
         ],
       ),
     );
@@ -217,7 +208,6 @@ class _FeedScreenState extends ConsumerState<FeedScreen> {
   Future<void> _openCreatePost() async {
     final result = await context.push<dynamic>(AppRoutes.createPost);
     if (result != null && mounted) {
-      // New post returned — refresh the feed so it appears at the top.
       ref.read(feedNotifierProvider.notifier).refresh();
     }
   }

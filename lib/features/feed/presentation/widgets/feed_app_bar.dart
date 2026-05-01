@@ -8,7 +8,7 @@ class FeedAppBar extends StatelessWidget implements PreferredSizeWidget {
   const FeedAppBar({super.key});
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(56);
 
   @override
   Widget build(BuildContext context) {
@@ -16,25 +16,36 @@ class FeedAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColors.background,
       elevation: 0,
       scrolledUnderElevation: 0,
+      titleSpacing: 20,
       title: Text(
         'Bondly.',
         style: GoogleFonts.playfairDisplay(
-          fontSize: 26,
+          fontSize: 28,
           fontWeight: FontWeight.w700,
-          color: AppColors.primary,
-          letterSpacing: -0.3,
+          color: AppColors.textPrimary,
+          letterSpacing: -0.5,
         ),
       ),
       actions: [
         IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: AppColors.textPrimary),
-          onPressed: () => SnackHelper.showSuccess(context, 'Próximamente'),
+          icon: const Icon(
+            Icons.notifications_outlined,
+            color: AppColors.textPrimary,
+            size: 24,
+          ),
+          onPressed: () => SnackHelper.showSuccess(context, 'Proximamente'),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
         ),
         IconButton(
-          icon: const Icon(Icons.send_outlined, color: AppColors.textPrimary),
-          onPressed: () => SnackHelper.showSuccess(context, 'Próximamente'),
+          icon: const Icon(
+            Icons.send_outlined,
+            color: AppColors.textPrimary,
+            size: 24,
+          ),
+          onPressed: () => SnackHelper.showSuccess(context, 'Proximamente'),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 8),
       ],
     );
   }

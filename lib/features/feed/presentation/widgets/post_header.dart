@@ -20,8 +20,9 @@ class PostHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(12, 12, 8, 8),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           _AuthorAvatar(author: author),
           const SizedBox(width: 10),
@@ -31,30 +32,40 @@ class PostHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  author.fullName,
+                  author.fullName.toLowerCase().replaceAll(' ', '.'),
                   style: GoogleFonts.dmSans(
-                    fontSize: 14,
+                    fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
+                    letterSpacing: 0.1,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
-                Text(
-                  _formatRelativeTime(createdAt),
-                  style: GoogleFonts.dmSans(
-                    fontSize: 12,
-                    color: AppColors.textSecondary,
-                  ),
-                ),
               ],
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.more_horiz, color: AppColors.textSecondary, size: 20),
-            onPressed: onMenuTap,
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+          // Time indicator
+          Text(
+            _formatRelativeTime(createdAt),
+            style: GoogleFonts.dmSans(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          // + BOND CTA — wired to onMenuTap for now (no follow module yet).
+          GestureDetector(
+            onTap: onMenuTap,
+            child: Text(
+              '+ BOND',
+              style: GoogleFonts.dmSans(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: 0.5,
+              ),
+            ),
           ),
         ],
       ),
@@ -64,10 +75,10 @@ class PostHeader extends StatelessWidget {
   String _formatRelativeTime(DateTime dt) {
     final diff = DateTime.now().difference(dt);
     if (diff.inMinutes < 1) return 'ahora';
-    if (diff.inMinutes < 60) return 'hace ${diff.inMinutes}m';
-    if (diff.inHours < 24) return 'hace ${diff.inHours}h';
-    if (diff.inDays < 7) return 'hace ${diff.inDays}d';
-    return 'hace ${(diff.inDays / 7).floor()}sem';
+    if (diff.inMinutes < 60) return '${diff.inMinutes}m';
+    if (diff.inHours < 24) return '${diff.inHours}H';
+    if (diff.inDays < 7) return '${diff.inDays}d';
+    return '${(diff.inDays / 7).floor()}sem';
   }
 }
 
@@ -82,7 +93,7 @@ class _AuthorAvatar extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: author.avatarUrl!,
         imageBuilder: (context, imageProvider) => CircleAvatar(
-          radius: 20,
+          radius: 18,
           backgroundImage: imageProvider,
         ),
         placeholder: (_, __) => _InitialAvatar(initial: author.initial),
@@ -101,14 +112,14 @@ class _InitialAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CircleAvatar(
-      radius: 20,
-      backgroundColor: AppColors.primary,
+      radius: 18,
+      backgroundColor: AppColors.border,
       child: Text(
         initial,
         style: GoogleFonts.dmSans(
-          fontSize: 16,
+          fontSize: 14,
           fontWeight: FontWeight.w700,
-          color: Colors.white,
+          color: AppColors.textPrimary,
         ),
       ),
     );

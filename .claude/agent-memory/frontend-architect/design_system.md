@@ -16,6 +16,8 @@ type: reference
 - `textPrimary` #FFFFFF
 - `textSecondary` #B0B0B8
 - `shimmerBase` #1C1C22, `shimmerHighlight` #2A2A33
+- `gold` #C8A97E (Founder accent — profile headers, Founders tab, SHARE BOND button, audience tiles)
+- `goldDark` #9C7A4E (gradient pair for gold buttons)
 
 ## Typography (AppTypography — lib/core/constants/app_typography.dart)
 - Headlines/Display: **Playfair Display** (google_fonts)

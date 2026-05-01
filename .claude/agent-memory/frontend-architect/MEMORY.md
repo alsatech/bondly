@@ -5,3 +5,4 @@
 - [Design System](design_system.md) — Colors, typography, spacing conventions from skills.md
 - [Auth Module](auth_module.md) — Auth feature architecture, providers, repository, endpoints
 - [Reusable Widgets](reusable_widgets.md) — Shared widgets created and their file locations
+- [UI Redesign 2026-04-30](ui_redesign.md) — Which screens were redesigned, visual decisions made, files changed

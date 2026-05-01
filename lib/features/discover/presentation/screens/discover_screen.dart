@@ -35,7 +35,6 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     super.initState();
     _swiperController = AppinioSwiperController();
 
-    // Trigger initial load after the first frame.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(discoverNotifierProvider.notifier).loadInitial();
     });
@@ -47,23 +46,15 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     super.dispose();
   }
 
-  // ---------------------------------------------------------------------------
-  // Swipe handlers
-  // ---------------------------------------------------------------------------
+  // ── Swipe handlers ─────────────────────────────────────────────────────────
 
-  void _handleSwipeEnd(int previousIndex, int targetIndex, SwiperActivity activity) {
+  void _handleSwipeEnd(
+      int previousIndex, int targetIndex, SwiperActivity activity) {
     if (activity is! Swipe) return;
-
     final direction = activity.direction;
-
     if (direction == AxisDirection.right) {
       _onLike(previousIndex);
-    } else if (direction == AxisDirection.left) {
-      _onSkip();
-    }
-    // Up/down swipes are also technically allowed by the swiper but we treat
-    // them as skips to keep UX simple.
-    else {
+    } else {
       _onSkip();
     }
   }
@@ -72,7 +63,6 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     final state = ref.read(discoverNotifierProvider);
     if (state is! DiscoverReady) return;
     if (index >= state.queue.length) return;
-
     final candidate = state.queue[index];
     ref.read(discoverNotifierProvider.notifier).like(candidate.id).catchError(
       (Object e) {
@@ -88,18 +78,15 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
   }
 
   void _onCardPositionChanged(SwiperPosition position) {
-    final offset = position.offset;
     if (!mounted) return;
+    final screenWidth = MediaQuery.sizeOf(context).width;
     setState(() {
-      // Normalize to [-1, 1] roughly based on screen width.
-      final screenWidth = MediaQuery.sizeOf(context).width;
-      _swipeDirection = (offset.dx / (screenWidth * 0.5)).clamp(-1.0, 1.0);
+      _swipeDirection =
+          (position.offset.dx / (screenWidth * 0.5)).clamp(-1.0, 1.0);
     });
   }
 
-  // ---------------------------------------------------------------------------
-  // Match modal
-  // ---------------------------------------------------------------------------
+  // ── Match modal ────────────────────────────────────────────────────────────
 
   void _showMatchModal(String matchedName) {
     showGeneralDialog(
@@ -116,25 +103,18 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // Build
-  // ---------------------------------------------------------------------------
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    // Listen for mutual match results to trigger the modal.
     ref.listen<DiscoverState>(discoverNotifierProvider, (previous, next) {
       if (next is DiscoverReady &&
           next.lastMatchResult != null &&
           next.lastMatchResult!.isMutualMatch) {
-        // Defer until after the current build completes.
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted) return;
-          // Find candidate name from state (it may have been dequeued already,
-          // so we fall back to a generic string).
           _showMatchModal(
-            _getCandidateName(next.lastMatchResult!.targetUserId),
-          );
+              _getCandidateName(next.lastMatchResult!.targetUserId));
         });
       }
     });
@@ -157,13 +137,25 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       scrolledUnderElevation: 0,
       centerTitle: true,
       title: Text(
-        'Descubrir',
-        style: GoogleFonts.dmSans(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
+        'Discover',
+        style: GoogleFonts.playfairDisplay(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
+          letterSpacing: -0.3,
         ),
       ),
+      actions: [
+        IconButton(
+          icon: const Icon(
+            Icons.tune_rounded,
+            color: AppColors.textSecondary,
+            size: 22,
+          ),
+          onPressed: () => SnackHelper.showSuccess(context, 'Proximamente'),
+        ),
+        const SizedBox(width: 4),
+      ],
     );
   }
 
@@ -210,7 +202,7 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
             ),
             const SizedBox(height: 32),
             BondlyButton(
-              label: 'Reintentar',
+              label: 'Retry',
               onPressed: () =>
                   ref.read(discoverNotifierProvider.notifier).loadInitial(),
               variant: BondlyButtonVariant.primary,
@@ -224,10 +216,9 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
 
   Widget _buildReady(List<DiscoveryCandidate> queue) {
     final size = MediaQuery.sizeOf(context);
-
     return Column(
       children: [
-        const SizedBox(height: 8),
+        const SizedBox(height: 4),
         Expanded(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -235,30 +226,27 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
               controller: _swiperController,
               cardCount: queue.length,
               backgroundCardCount: 2,
-              backgroundCardScale: 0.92,
-              backgroundCardOffset: const Offset(0, 28),
-              maxAngle: 12,
+              backgroundCardScale: 0.93,
+              backgroundCardOffset: const Offset(0, 24),
+              maxAngle: 10,
               threshold: 60,
               swipeOptions: const SwipeOptions.symmetric(horizontal: true),
               onSwipeEnd: _handleSwipeEnd,
               onCardPositionChanged: _onCardPositionChanged,
-              onEnd: () {
-                ref.read(discoverNotifierProvider.notifier).skip();
-              },
+              onEnd: () => ref.read(discoverNotifierProvider.notifier).skip(),
               cardBuilder: (context, index) {
                 if (index >= queue.length) return const SizedBox.shrink();
-                final isTop = index == 0;
                 return DiscoverCard(
                   candidate: queue[index],
-                  swipeDirection: isTop ? _swipeDirection : 0.0,
+                  swipeDirection: index == 0 ? _swipeDirection : 0.0,
                 );
               },
             ),
           ),
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
         _buildActionRow(size),
-        const SizedBox(height: 24),
+        const SizedBox(height: 28),
       ],
     );
   }
@@ -269,26 +257,24 @@ class _DiscoverScreenState extends ConsumerState<DiscoverScreen> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         SkipActionButton(
-          size: 56,
+          size: 58,
           onPressed: () => _swiperController.swipeLeft(),
         ),
-        const SizedBox(width: 40),
+        const SizedBox(width: 36),
         LikeActionButton(
-          size: 72,
+          size: 74,
           onPressed: () => _swiperController.swipeRight(),
         ),
       ],
     );
   }
 
-  /// Attempts to find the candidate name from the current queue.
-  /// Falls back to a generic string if the user was already dequeued.
   String _getCandidateName(String targetUserId) {
     final state = ref.read(discoverNotifierProvider);
     if (state is DiscoverReady) {
       final match = state.queue.where((c) => c.id == targetUserId);
       if (match.isNotEmpty) return match.first.fullName;
     }
-    return 'esta persona';
+    return 'this person';
   }
 }

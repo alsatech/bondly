@@ -17,6 +17,10 @@ abstract final class AppColors {
   static const textPrimary = Color(0xFFFFFFFF);
   static const textSecondary = Color(0xFFB0B0B8);
 
+  // Gold / Founder accent
+  static const gold = Color(0xFFC8A97E);
+  static const goldDark = Color(0xFF9C7A4E);
+
   // Shimmer
   static const shimmerBase = Color(0xFF1C1C22);
   static const shimmerHighlight = Color(0xFF2A2A33);

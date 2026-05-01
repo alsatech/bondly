@@ -28,60 +28,65 @@ class DiscoverCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final cardWidth = size.width - 32;
-    final cardHeight = size.height * 0.62;
+    final cardHeight = size.height * 0.64;
 
     return SizedBox(
       width: cardWidth,
       height: cardHeight,
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         child: Stack(
           fit: StackFit.expand,
           children: [
-            // Background: image or gradient
+            // Background: image or gradient placeholder
             _buildBackground(),
 
-            // Bottom-to-top dark gradient for text legibility (only when avatar present).
-            if (candidate.avatarUrl != null)
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      stops: const [0.5, 1.0],
-                      colors: [
-                        Colors.transparent,
-                        AppColors.background.withValues(alpha: 0.85),
-                      ],
-                    ),
+            // Bottom gradient for text legibility
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    stops: const [0.45, 1.0],
+                    colors: [
+                      Colors.transparent,
+                      Colors.black.withValues(alpha: 0.82),
+                    ],
                   ),
                 ),
               ),
+            ),
 
-            // Swipe overlay tint.
+            // Swipe direction color overlay
             if (swipeDirection != 0.0) _buildSwipeOverlay(),
 
-            // Bottom-left content
+            // Bottom content: name, badges
             Positioned(
-              left: 20,
-              right: 20,
-              bottom: 28,
+              left: 22,
+              right: 22,
+              bottom: 30,
               child: _buildContent(),
             ),
 
-            // Swipe stamp labels.
+            // Swipe direction stamp
             if (swipeDirection > 0.15)
               Positioned(
-                top: 32,
+                top: 36,
                 left: 24,
-                child: _SwipeStamp(label: 'ME GUSTA', color: AppColors.success),
+                child: _SwipeStamp(
+                  label: 'LIKE',
+                  color: AppColors.success,
+                ),
               ),
             if (swipeDirection < -0.15)
               Positioned(
-                top: 32,
+                top: 36,
                 right: 24,
-                child: _SwipeStamp(label: 'PASAR', color: AppColors.textSecondary),
+                child: _SwipeStamp(
+                  label: 'PASS',
+                  color: AppColors.textSecondary,
+                ),
               ),
           ],
         ),
@@ -105,9 +110,8 @@ class DiscoverCard extends StatelessWidget {
   Widget _buildSwipeOverlay() {
     final isLike = swipeDirection > 0;
     final color = isLike
-        ? AppColors.success.withValues(alpha: swipeDirection.abs() * 0.35)
-        : AppColors.textSecondary.withValues(alpha: swipeDirection.abs() * 0.25);
-
+        ? AppColors.success.withValues(alpha: swipeDirection.abs() * 0.30)
+        : AppColors.textSecondary.withValues(alpha: swipeDirection.abs() * 0.20);
     return Positioned.fill(child: ColoredBox(color: color));
   }
 
@@ -116,29 +120,30 @@ class DiscoverCard extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // "Alta afinidad" pill — only when score > 0.7.
+        // High-affinity badge
         if (candidate.score > 0.7) ...[
           _AffinityBadge(),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
         ],
-        // Full name
+        // Full name — Playfair Display, large
         Text(
           candidate.fullName,
           style: GoogleFonts.playfairDisplay(
-            fontSize: 32,
+            fontSize: 34,
             fontWeight: FontWeight.w700,
             color: Colors.white,
+            letterSpacing: -0.5,
             shadows: [
               Shadow(
-                color: Colors.black.withValues(alpha: 0.6),
-                blurRadius: 8,
+                color: Colors.black.withValues(alpha: 0.5),
+                blurRadius: 10,
               ),
             ],
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        // Shared interests chip
+        // Shared interests
         if (candidate.sharedInterestsCount > 0) ...[
           const SizedBox(height: 8),
           _SharedInterestsBadge(count: candidate.sharedInterestsCount),
@@ -148,11 +153,10 @@ class DiscoverCard extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Supporting widgets
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
-/// Full coral→purple gradient background shown when avatar_url is null.
 class _GradientBackground extends StatelessWidget {
   const _GradientBackground({required this.initial});
 
@@ -174,7 +178,7 @@ class _GradientBackground extends StatelessWidget {
         style: GoogleFonts.playfairDisplay(
           fontSize: 96,
           fontWeight: FontWeight.w700,
-          color: Colors.white,
+          color: Colors.white.withValues(alpha: 0.4),
         ),
       ),
     );
@@ -185,18 +189,27 @@ class _AffinityBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.primary,
+        color: AppColors.gold.withValues(alpha: 0.18),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.gold.withValues(alpha: 0.5)),
       ),
-      child: Text(
-        'Alta afinidad',
-        style: GoogleFonts.dmSans(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star_rounded, color: AppColors.gold, size: 11),
+          const SizedBox(width: 4),
+          Text(
+            'High affinity',
+            style: GoogleFonts.dmSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.gold,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -212,14 +225,14 @@ class _SharedInterestsBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: AppColors.accent.withValues(alpha: 0.85),
+        color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        '$count intereses en común',
+        '$count interests in common',
         style: AppTypography.bodySmall.copyWith(
-          color: AppColors.textPrimary,
-          fontWeight: FontWeight.w600,
+          color: Colors.white,
+          fontWeight: FontWeight.w500,
         ),
       ),
     );
@@ -237,15 +250,16 @@ class _SwipeStamp extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
-        border: Border.all(color: color, width: 3),
+        border: Border.all(color: color, width: 2.5),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         label,
         style: AppTypography.labelLarge.copyWith(
           color: color,
-          letterSpacing: 2,
+          letterSpacing: 2.5,
           fontWeight: FontWeight.w800,
+          fontSize: 16,
         ),
       ),
     );

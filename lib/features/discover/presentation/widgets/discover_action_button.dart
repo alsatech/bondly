@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_colors.dart';
 
-/// Like action button (heart) — primary CTA, 72px, green background with glow.
+/// Like action button (heart) — primary CTA, green fill with subtle glow.
 class LikeActionButton extends StatelessWidget {
   const LikeActionButton({
     super.key,
@@ -26,7 +26,7 @@ class LikeActionButton extends StatelessWidget {
   }
 }
 
-/// Skip action button (X) — 56px, dark background.
+/// Skip action button (X) — smaller, dark card background with border.
 class SkipActionButton extends StatelessWidget {
   const SkipActionButton({
     super.key,
@@ -43,16 +43,17 @@ class SkipActionButton extends StatelessWidget {
       onPressed: onPressed,
       size: size,
       icon: Icons.close_rounded,
-      iconColor: Colors.white,
-      backgroundColor: AppColors.border,
+      iconColor: AppColors.textSecondary,
+      backgroundColor: AppColors.card,
       shadowColor: Colors.transparent,
+      hasBorder: true,
     );
   }
 }
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 // Internal shared implementation
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────────────
 
 class _CircleActionButton extends StatelessWidget {
   const _CircleActionButton({
@@ -62,6 +63,7 @@ class _CircleActionButton extends StatelessWidget {
     required this.iconColor,
     required this.backgroundColor,
     required this.shadowColor,
+    this.hasBorder = false,
   });
 
   final VoidCallback onPressed;
@@ -70,6 +72,7 @@ class _CircleActionButton extends StatelessWidget {
   final Color iconColor;
   final Color backgroundColor;
   final Color shadowColor;
+  final bool hasBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -81,11 +84,14 @@ class _CircleActionButton extends StatelessWidget {
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: backgroundColor,
+          border: hasBorder
+              ? Border.all(color: AppColors.border, width: 1.5)
+              : null,
           boxShadow: shadowColor != Colors.transparent
               ? [
                   BoxShadow(
-                    color: shadowColor.withValues(alpha: 0.30),
-                    blurRadius: 16,
+                    color: shadowColor.withValues(alpha: 0.25),
+                    blurRadius: 20,
                     spreadRadius: 2,
                   ),
                 ]
@@ -94,7 +100,7 @@ class _CircleActionButton extends StatelessWidget {
         child: Icon(
           icon,
           color: iconColor,
-          size: size * 0.42,
+          size: size * 0.40,
         ),
       ),
     );
