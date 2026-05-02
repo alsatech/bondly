@@ -1,5 +1,5 @@
 abstract final class ApiEndpoints {
-  static const String baseUrl = 'https://becoming-satellite-floors-include.trycloudflare.com';
+  static const String baseUrl = 'https://gotta-national-chapter-instead.trycloudflare.com';
 
   // Auth
   static const String register = '/api/v1/auth/register';
