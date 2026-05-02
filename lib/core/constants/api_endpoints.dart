@@ -1,5 +1,5 @@
 abstract final class ApiEndpoints {
-  static const String baseUrl = 'https://such-platypus-pox.ngrok-free.dev';
+  static const String baseUrl = 'https://becoming-satellite-floors-include.trycloudflare.com';
 
   // Auth
   static const String register = '/api/v1/auth/register';
