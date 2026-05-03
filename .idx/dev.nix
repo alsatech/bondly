@@ -37,11 +37,12 @@
             "--web-hostname"
             "0.0.0.0"
             "--web-port"
-            "$PORT"
-            # Firebase Studio serves the preview over HTTPS but the Flutter
-            # debug client opens an insecure ws:// connection for hot reload,
-            # which browsers block as mixed content — leaves the page blank.
-            # Profile mode skips the injected debug client.
+            "3000"
+            # Using port 3000 instead of $PORT to avoid Firebase Studio's
+            # built-in auth proxy that intercepts requests on the assigned
+            # preview port (typically 9002). Port 3000 is not intercepted
+            # by Firebase Studio's forwardAuthCookie mechanism, so login
+            # requests reach the backend directly.
             # TECH_DEBT: re-enable debug hot reload once Firebase Studio
             # supports WSS forwarding to the preview port.
             "--profile"
